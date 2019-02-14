@@ -2,8 +2,11 @@ package com.owson.photoeditorapp;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +29,9 @@ import com.owson.photoeditor.PhotoEditorView;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.owson.photoeditor.ViewType;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,9 +39,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int RESULT_LOAD_IMG_REQUEST_CODE = 778;
+    private static final int SHARE_STORAGE_PERMS_REQUEST_CODE = 900;
+    private final String[] sharePerms = { android.Manifest.permission.WRITE_EXTERNAL_STORAGE,  android.Manifest.permission.READ_EXTERNAL_STORAGE};
+
 
     @BindView(R.id.mainContainer)
     View mainContainer;
@@ -94,6 +107,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -113,6 +134,44 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.addTextButton)
     void onAddTextButtonClick() {
         openAddTextPopupWindow("", -1);
+    }
+
+    @OnClick(R.id.shareImageButton)
+    void onShareImageButtonClick() {
+        boolean has_perms = EasyPermissions.hasPermissions(MainActivity.this, sharePerms);
+        if (has_perms)
+            shareImage();
+        else {
+            EasyPermissions.requestPermissions(
+                    MainActivity.this,
+                    getString(R.string.rationale_storage),
+                    SHARE_STORAGE_PERMS_REQUEST_CODE,
+                    sharePerms);
+        }
+    }
+
+    @AfterPermissionGranted(SHARE_STORAGE_PERMS_REQUEST_CODE)
+    private void shareImage() {
+        Bitmap bmp = photoEditorView.getViewAdBitmapImage();
+        if(bmp == null) {
+            //Show no bitmap message
+            return;
+        }
+
+        Uri uri = getUriImageFromBitmap(bmp, MainActivity.this);
+        if(uri == null) {
+            //Show no URI message
+            return;
+        }
+
+        final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+
+//        shareIntent.putExtra(Intent.EXTRA_TEXT, IMAGE_URL);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        shareIntent.setType("image/png");
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        startActivity(Intent.createChooser(shareIntent, "Share image using"));
     }
 
     private void openAddTextPopupWindow(String text, int colorCode) {
@@ -196,4 +255,29 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    private Uri getUriImageFromBitmap(Bitmap bmp, Context context) {
+        if(bmp == null)
+            return null;
+
+        Uri bmpUri = null;
+
+        try {
+
+            File file =  new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "IMG_" + System.currentTimeMillis() + ".png");
+            FileOutputStream out = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
+            out.flush();
+            out.close();
+
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            bmpUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file);
+//            else
+//                bmpUri = Uri.fromFile(file);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bmpUri;
+    }
 }

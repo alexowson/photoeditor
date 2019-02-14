@@ -2,4 +2,6 @@
     <string name="app_name">Photo Editor</string>
 
     <string name="adjust">Adjust</string>
+
+    <string name="rationale_storage">App needs access to your storage</string>
 </resources>

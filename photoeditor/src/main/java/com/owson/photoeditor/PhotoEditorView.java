@@ -2,9 +2,15 @@ package com.owson.photoeditor;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Environment;
+import android.support.annotation.MainThread;
+import android.support.annotation.UiThread;
+import android.support.annotation.WorkerThread;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +20,9 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.naver.android.helloyako.imagecrop.view.ImageCropView;
+
+import java.io.File;
+import java.io.FileOutputStream;
 
 public class PhotoEditorView extends FrameLayout implements View.OnClickListener {
     private static final String TAG = "PhotoEditorView";
@@ -127,6 +136,56 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
 //            onPhotoEditorListener.onAddViewListener(ViewType.TEXT, addedViews.size());
     }
 
+    /*@UiThread
+    public String saveImage(String folderName, String imageName) {
+        String selectedOutputPath = "";
+        if (isSDCARDMounted()) {
+            File mediaStorageDir = new File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), folderName);
+            // Create a storage directory if it does not exist
+            if (!mediaStorageDir.exists()) {
+                if (!mediaStorageDir.mkdirs()) {
+                    Log.d("PhotoEditorSDK", "Failed to create directory");
+                }
+            }
+            // Create a media file name
+            selectedOutputPath = mediaStorageDir.getPath() + File.separator + imageName;
+            Log.d("PhotoEditorSDK", "selected camera path " + selectedOutputPath);
+            File file = new File(selectedOutputPath);
+            try {
+                FileOutputStream out = new FileOutputStream(file);
+
+                setDrawingCacheEnabled(true);
+                getDrawingCache().compress(Bitmap.CompressFormat.JPEG, 80, out);
+
+                out.flush();
+                out.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return selectedOutputPath;
+    }*/
+
+    public Bitmap getViewAdBitmapImage() {
+        //Define a bitmap with the same size as the view
+        Bitmap returnedBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        //Bind a canvas to it
+        Canvas canvas = new Canvas(returnedBitmap);
+        //Get the view's background
+        Drawable bgDrawable = getBackground();
+        if (bgDrawable != null)
+            //has background drawable, then draw it on the canvas
+            bgDrawable.draw(canvas);
+        else
+            //does not have background drawable, then draw white background on the canvas
+            canvas.drawColor(Color.WHITE);
+        // draw the view on the canvas
+        draw(canvas);
+        //return the bitmap
+        return returnedBitmap;
+    }
+
     public void setImageFilePath(String imagePath) {
         photoImageView.setImageFilePath(imagePath);
     }
@@ -148,6 +207,10 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
 
     public Button getAdjustButton() {
         return adjustButton;
+    }
+
+    public void setOnPhotoEditorListener(OnPhotoEditorListener onPhotoEditorListener) {
+        this.onPhotoEditorListener = onPhotoEditorListener;
     }
 
     private void centerCropImageView() {
@@ -208,7 +271,8 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
         }
     };
 
-    public void setOnPhotoEditorListener(OnPhotoEditorListener onPhotoEditorListener) {
-        this.onPhotoEditorListener = onPhotoEditorListener;
+    private boolean isSDCARDMounted() {
+        String status = Environment.getExternalStorageState();
+        return status.equals(Environment.MEDIA_MOUNTED);
     }
 }

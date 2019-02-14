@@ -35,4 +35,7 @@ dependencies {
 
     //Image Picker
     implementation 'com.github.esafirm.android-image-picker:imagepicker:1.13.1'
+
+    //Permissions
+    implementation 'pub.devrel:easypermissions:2.0.1'
 }
