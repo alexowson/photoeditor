@@ -1,0 +1,3 @@
+<resources>
+    <dimen name="adjust_button_margin">8dp</dimen>
+</resources>

@@ -1,3 +1,5 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="adjust_button_size">25dp</dimen>
 </resources>

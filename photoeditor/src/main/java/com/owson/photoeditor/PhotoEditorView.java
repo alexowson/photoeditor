@@ -57,11 +57,15 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
 
         //Adding button
         adjustButton = new Button(context);
-        adjustButton.setText("<>");
+        adjustButton.setText(getResources().getString(R.string.adjust));
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 ViewGroup.MarginLayoutParams.WRAP_CONTENT,
                 ViewGroup.MarginLayoutParams.WRAP_CONTENT);
         lp.gravity = Gravity.LEFT | Gravity.BOTTOM;
+        lp.setMargins(getResources().getDimensionPixelSize(R.dimen.adjust_button_margin),
+                getResources().getDimensionPixelSize(R.dimen.adjust_button_margin),
+                getResources().getDimensionPixelSize(R.dimen.adjust_button_margin),
+                getResources().getDimensionPixelSize(R.dimen.adjust_button_margin));
         adjustButton.setLayoutParams(lp);
         adjustButton.setOnClickListener(this);
         addView(adjustButton);
@@ -84,6 +88,10 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
     public void setImageDrawable(Drawable imageDrawable) {
         photoImageView.setImageDrawable(imageDrawable);
         centerCropImageView();
+    }
+
+    public Button getAdjustButton() {
+        return adjustButton;
     }
 
     private void centerCropImageView() {

@@ -1,6 +1,7 @@
 package com.owson.photoeditorapp;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -52,6 +53,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         photoEditorView.setImageResource(R.drawable.cat);
+        photoEditorView.getAdjustButton().setText("");
+        photoEditorView.getAdjustButton().getLayoutParams().width = getResources().getDimensionPixelSize(R.dimen.adjust_button_size);
+        photoEditorView.getAdjustButton().getLayoutParams().height = getResources().getDimensionPixelSize(R.dimen.adjust_button_size);
+        photoEditorView.getAdjustButton().setBackgroundResource(R.drawable.adjust_button_bg);
+        photoEditorView.getAdjustButton().setCompoundDrawablesWithIntrinsicBounds(
+                getResources().getDrawable(R.drawable.ic_adjust),
+                null, null, null);
     }
 
     @Override
