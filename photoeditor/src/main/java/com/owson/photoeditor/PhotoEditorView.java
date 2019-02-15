@@ -5,10 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Environment;
-import android.support.annotation.MainThread;
-import android.support.annotation.UiThread;
-import android.support.annotation.WorkerThread;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -21,10 +17,7 @@ import android.widget.TextView;
 
 import com.naver.android.helloyako.imagecrop.view.ImageCropView;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
-public class PhotoEditorView extends FrameLayout implements View.OnClickListener {
+public class PhotoEditorView extends FrameLayout {
     private static final String TAG = "PhotoEditorView";
 
     private Context context;
@@ -84,7 +77,7 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
                 getResources().getDimensionPixelSize(R.dimen.adjust_button_margin),
                 getResources().getDimensionPixelSize(R.dimen.adjust_button_margin));
         adjustButton.setLayoutParams(lp);
-        adjustButton.setOnClickListener(this);
+        adjustButton.setOnClickListener(onClickListener);
         addView(adjustButton);
 
         /*deleteView = new RelativeLayout(context);
@@ -181,12 +174,12 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
         this.onPhotoEditorListener = onPhotoEditorListener;
     }
 
-    private void centerCropImageView() {
+    public void centerCropImageView() {
         photoImageView.setAspectRatio(1, 1);
         photoImageState = PhotoImageState.CENTER_CROP;
     }
 
-    private void centerFitImageView() {
+    public void centerFitImageView() {
         photoImageView.setAspectRatio(720, 405);
         photoImageState = PhotoImageState.CENTER_FIT;
     }
@@ -210,13 +203,6 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
         }*/
     }
 
-    @Override
-    public void onClick(View v) {
-        if(v == adjustButton) {
-            handleImageAdjust();
-        }
-    }
-
     private MultiTouchListener.OnMultiTouchListener onMultiTouchListener = new MultiTouchListener.OnMultiTouchListener() {
         @Override
         public void onEditTextClickListener(String text, int colorCode) {
@@ -236,6 +222,15 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
         @Override
         public void onDoubleTap() {
             handleImageAdjust();
+        }
+    };
+
+    private OnClickListener onClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(v == adjustButton) {
+                handleImageAdjust();
+            }
         }
     };
 }
