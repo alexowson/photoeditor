@@ -12,6 +12,8 @@ public interface OnPhotoEditorListener {
 
 //    void onRemoveViewListener(int numberOfAddedViews);
 
+    void onChangeModeListener(PhotoEditorView.Mode mode);
+
     void onStartViewChangeListener(ViewType viewType);
 
     void onStopViewChangeListener(ViewType viewType);

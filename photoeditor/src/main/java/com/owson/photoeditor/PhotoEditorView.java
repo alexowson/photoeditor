@@ -24,17 +24,16 @@ public class PhotoEditorView extends FrameLayout {
 
     private Button adjustButton;
     private ImageCropView photoImageView;
-    private PhotoImageState photoImageState = PhotoImageState.NONE;
+    private Mode mode = Mode.SQUARE;
 
     private View addTextRootView;
     private View deleteView;
 
     private OnPhotoEditorListener onPhotoEditorListener;
 
-    public enum PhotoImageState {
-        NONE,
-        CENTER_CROP,
-        CENTER_FIT
+    public enum Mode {
+        SQUARE,
+        FREE
     }
     
     public PhotoEditorView(Context context) {
@@ -62,8 +61,8 @@ public class PhotoEditorView extends FrameLayout {
         photoImageView.setTransparentLayerColor(Color.parseColor("#00000000"));
         photoImageView.setDoubleTapListener(doubleTapListener);
 //        photoImageView.setDoubleTapEnabled(true);
-
         addView(photoImageView);
+        squareMode();
 
         //Adding button
         adjustButton = new Button(context);
@@ -149,17 +148,14 @@ public class PhotoEditorView extends FrameLayout {
 
     public void setImageBitmap(Bitmap imageBitmap) {
         photoImageView.setImageBitmap(imageBitmap);
-        centerCropImageView();
     }
 
     public void setImageResource(int resId) {
         photoImageView.setImageResource(resId);
-        centerCropImageView();
     }
 
     public void setImageDrawable(Drawable imageDrawable) {
         photoImageView.setImageDrawable(imageDrawable);
-        centerCropImageView();
     }
 
     public void setDisabledAdjustCropAreaImage(boolean disabledAdjustCropAreaImage) {
@@ -174,21 +170,41 @@ public class PhotoEditorView extends FrameLayout {
         this.onPhotoEditorListener = onPhotoEditorListener;
     }
 
-    public void centerCropImageView() {
+    private void squareMode() {
         photoImageView.setAspectRatio(1, 1);
-        photoImageState = PhotoImageState.CENTER_CROP;
+        mode = Mode.SQUARE;
+        if(onPhotoEditorListener != null)
+            onPhotoEditorListener.onChangeModeListener(mode);
     }
 
-    public void centerFitImageView() {
+    private void freeMode() {
         photoImageView.setAspectRatio(720, 405);
-        photoImageState = PhotoImageState.CENTER_FIT;
+        mode = Mode.FREE;
+        if(onPhotoEditorListener != null)
+            onPhotoEditorListener.onChangeModeListener(mode);
+    }
+
+    public void setMode(Mode mode) {
+        switch (mode) {
+            case SQUARE:
+                squareMode();
+                break;
+            case FREE:
+                freeMode();
+                break;
+        }
+    }
+
+    public Mode getMode() {
+        return mode;
     }
 
     private void handleImageAdjust() {
-        if(photoImageState != PhotoImageState.CENTER_CROP) {
-            centerCropImageView();
+//        if(photoImageState != PhotoImageState.CENTER_CROP) {
+        if(mode != Mode.SQUARE) {
+            squareMode();
         }else {
-            centerFitImageView();
+            freeMode();
         }
     }
 
