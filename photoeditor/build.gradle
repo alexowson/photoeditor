@@ -33,6 +33,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
 //    implementation "com.naver.android.helloyako:imagecropview:1.2.0"
-    implementation 'com.github.alexowson:android-imagecropview:master-SNAPSHOT'
+    implementation 'com.github.alexowson:android-imagecropview:1.2.3'
 
 }

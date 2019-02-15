@@ -205,6 +205,10 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
         centerCropImageView();
     }
 
+    public void setDisabledAdjustCropAreaImage(boolean disabledAdjustCropAreaImage) {
+        photoImageView.setDisabledAdjustCropAreaImage(disabledAdjustCropAreaImage);
+    }
+
     public Button getAdjustButton() {
         return adjustButton;
     }
