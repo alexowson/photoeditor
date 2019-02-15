@@ -246,6 +246,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
+        public void onChangeModeListener(PhotoEditorView.Mode mode) {
+            if(mode == PhotoEditorView.Mode.SQUARE)
+                photoEditorView.setDisabledAdjustCropAreaImage(false);
+            else if(mode == PhotoEditorView.Mode.FREE)
+                photoEditorView.setDisabledAdjustCropAreaImage(true);
+        }
+
+        @Override
         public void onStartViewChangeListener(ViewType viewType) {
 
         }
