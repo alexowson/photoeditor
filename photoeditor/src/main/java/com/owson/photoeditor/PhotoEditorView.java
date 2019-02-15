@@ -108,11 +108,6 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
         addView(deleteView, params);
 
         deleteView.setVisibility(GONE);
-
-//        ViewGroup.LayoutParams lp = deleteView.getLayoutParams();
-//        lp.getClass();
-//        lp.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
-//        deleteView.setLayoutParams(lp);
     }
 
     public void addText(String text, int colorCodeTextView) {
@@ -135,37 +130,6 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
 //        if (onPhotoEditorListener != null)
 //            onPhotoEditorListener.onAddViewListener(ViewType.TEXT, addedViews.size());
     }
-
-    /*@UiThread
-    public String saveImage(String folderName, String imageName) {
-        String selectedOutputPath = "";
-        if (isSDCARDMounted()) {
-            File mediaStorageDir = new File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), folderName);
-            // Create a storage directory if it does not exist
-            if (!mediaStorageDir.exists()) {
-                if (!mediaStorageDir.mkdirs()) {
-                    Log.d("PhotoEditorSDK", "Failed to create directory");
-                }
-            }
-            // Create a media file name
-            selectedOutputPath = mediaStorageDir.getPath() + File.separator + imageName;
-            Log.d("PhotoEditorSDK", "selected camera path " + selectedOutputPath);
-            File file = new File(selectedOutputPath);
-            try {
-                FileOutputStream out = new FileOutputStream(file);
-
-                setDrawingCacheEnabled(true);
-                getDrawingCache().compress(Bitmap.CompressFormat.JPEG, 80, out);
-
-                out.flush();
-                out.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return selectedOutputPath;
-    }*/
 
     public Bitmap getViewAdBitmapImage() {
         //Define a bitmap with the same size as the view
@@ -274,9 +238,4 @@ public class PhotoEditorView extends FrameLayout implements View.OnClickListener
             handleImageAdjust();
         }
     };
-
-    private boolean isSDCARDMounted() {
-        String status = Environment.getExternalStorageState();
-        return status.equals(Environment.MEDIA_MOUNTED);
-    }
 }
