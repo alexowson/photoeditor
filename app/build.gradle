@@ -36,6 +36,9 @@ dependencies {
     //Image Picker
     implementation 'com.github.esafirm.android-image-picker:imagepicker:1.13.1'
 
+    //SeekBar
+    implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.6'
+
     //Permissions
     implementation 'pub.devrel:easypermissions:2.0.1'
 }

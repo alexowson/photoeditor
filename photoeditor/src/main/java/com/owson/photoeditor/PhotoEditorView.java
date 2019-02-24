@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -102,7 +103,7 @@ public class PhotoEditorView extends FrameLayout {
         deleteView.setVisibility(GONE);
     }
 
-    public void addText(String text, int colorCodeTextView, int gravity) {
+    public void addText(String text, int colorCodeTextView, int gravity, float text_size_dip) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         addTextRootView = inflater.inflate(R.layout.photo_editor_sdk_text_item_list, null);
         TextView addTextView = (TextView) addTextRootView.findViewById(R.id.photo_editor_sdk_text_tv);
@@ -118,6 +119,7 @@ public class PhotoEditorView extends FrameLayout {
         params.gravity = Gravity.CENTER;
         addView(addTextRootView, params);
         addTextView.setGravity(gravity);
+        addTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, text_size_dip);
 //        addedViews.add(addTextRootView);
 //        if (onPhotoEditorListener != null)
 //            onPhotoEditorListener.onAddViewListener(ViewType.TEXT, addedViews.size());

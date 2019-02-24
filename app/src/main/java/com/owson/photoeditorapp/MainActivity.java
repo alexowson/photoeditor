@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.esafirm.imagepicker.model.Image;
+import com.jaygoo.widget.OnRangeChangedListener;
+import com.jaygoo.widget.RangeSeekBar;
+import com.jaygoo.widget.VerticalRangeSeekBar;
 import com.owson.photoeditor.OnPhotoEditorListener;
 import com.owson.photoeditor.PhotoEditorView;
 
@@ -54,15 +58,20 @@ public class MainActivity extends AppCompatActivity {
     private static final int GRAVITY_LEFT = Gravity.LEFT|Gravity.CENTER_VERTICAL;
     private static final int GRAVITY_RIGHT = Gravity.RIGHT|Gravity.CENTER_VERTICAL;
 
+    private static final int TEXT_SIZE_DIP_MIN = 44;
+    private static final int TEXT_SIZE_DIP_MAX = 64;
+
     @BindView(R.id.mainContainer)
     View mainContainer;
 
     @BindView(R.id.photoEditorView)
     PhotoEditorView photoEditorView;
 
+    private ArrayList<Integer> colorPickerColors;
+
     private int colorCodeTextView = -1;
     private int gravityTextView = GRAVITY_CENTER;
-    private ArrayList<Integer> colorPickerColors;
+    private float textSizeTextView = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.addTextButton)
     void onAddTextButtonClick() {
-        openAddTextPopupWindow("", -1, GRAVITY_CENTER);
+        openAddTextPopupWindow("", -1, GRAVITY_CENTER, TEXT_SIZE_DIP_MIN);
     }
 
     @OnClick(R.id.shareImageButton)
@@ -179,13 +188,15 @@ public class MainActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(shareIntent, "Share image using"));
     }
 
-    private void openAddTextPopupWindow(String text, int colorCode, int gravity) {
+    private void openAddTextPopupWindow(String text, int colorCode, int gravity, float text_size_dip) {
         colorCodeTextView = colorCode;
         gravityTextView  = gravity;
+        textSizeTextView  = text_size_dip;
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View addTextPopupWindowRootView = inflater.inflate(R.layout.add_text_popup_window, null);
         final EditText addTextEditText = (EditText) addTextPopupWindowRootView.findViewById(R.id.add_text_edit_text);
         TextView addTextDoneTextView = (TextView) addTextPopupWindowRootView.findViewById(R.id.add_text_done_tv);
+        addTextEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeTextView);
         final ImageView addTextAlignImageView = (ImageView) addTextPopupWindowRootView.findViewById(R.id.add_text_align_iv);
 
         switch (gravityTextView) {
@@ -200,6 +211,31 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         addTextEditText.setGravity(gravityTextView);
+
+//        float text_size_min = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, TEXT_SIZE_DIP_MIN, getResources().getDisplayMetrics());
+//        float text_size_max = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, TEXT_SIZE_DIP_MAX, getResources().getDisplayMetrics());
+
+        VerticalRangeSeekBar fontSizeSeekBar = addTextPopupWindowRootView.findViewById(R.id.fontSizeSeekBar);
+        fontSizeSeekBar.setRange(TEXT_SIZE_DIP_MIN, TEXT_SIZE_DIP_MAX);
+        fontSizeSeekBar.setValue(text_size_dip);
+        fontSizeSeekBar.setOnRangeChangedListener(new OnRangeChangedListener() {
+            @Override
+            public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
+//                Log.i(TAG, "onRangeChanged: " + leftValue + ", " + rightValue);
+                textSizeTextView = leftValue;
+                addTextEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeTextView);
+            }
+
+            @Override
+            public void onStartTrackingTouch(RangeSeekBar view, boolean isLeft) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(RangeSeekBar view, boolean isLeft) {
+
+            }
+        });
 
         RecyclerView addTextColorPickerRecyclerView = (RecyclerView) addTextPopupWindowRootView.findViewById(R.id.add_text_color_picker_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
@@ -250,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
         addTextDoneTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addText(addTextEditText.getText().toString(), colorCodeTextView, gravityTextView);
+                addText(addTextEditText.getText().toString(), colorCodeTextView, gravityTextView, textSizeTextView);
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 pop.dismiss();
@@ -267,8 +303,8 @@ public class MainActivity extends AppCompatActivity {
                 .start(RESULT_LOAD_IMG_REQUEST_CODE);
     }
 
-    private void addText(String text, int colorCodeTextView, int gravity) {
-        photoEditorView.addText(text, colorCodeTextView, gravity);
+    private void addText(String text, int colorCodeTextView, int gravity, float text_size) {
+        photoEditorView.addText(text, colorCodeTextView, gravity, text_size);
     }
 
     private boolean stringIsNotEmpty(String string) {
@@ -282,8 +318,8 @@ public class MainActivity extends AppCompatActivity {
 
     private OnPhotoEditorListener onPhotoEditorSDKListener = new OnPhotoEditorListener() {
         @Override
-        public void onEditTextChangeListener(String text, int colorCode, int gravity) {
-            openAddTextPopupWindow(text, colorCode, gravity);
+        public void onEditTextChangeListener(String text, int colorCode, int gravity, float text_size_dip) {
+            openAddTextPopupWindow(text, colorCode, gravity, text_size_dip);
         }
 
         @Override

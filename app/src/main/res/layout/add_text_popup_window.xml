@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#B3000000"
@@ -16,6 +18,17 @@
         android:background="@drawable/rounded_border_text_view"
         android:padding="10dp"
         android:src="@drawable/ic_align_center" />
+
+    <!--<SeekBar-->
+        <!--android:id="@+id/seekBar"-->
+        <!--android:layout_width="100dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:max="10"-->
+        <!--android:progress="5"-->
+        <!--android:rotation="270" />-->
 
     <TextView
         android:id="@+id/add_text_done_tv"
@@ -44,6 +57,7 @@
         android:inputType="textMultiLine"
         android:textSize="40sp" />
 
+
     <RelativeLayout
         android:id="@+id/add_text_color_picker_relative_layout"
         android:layout_width="match_parent"
@@ -56,5 +70,17 @@
             android:layout_height="wrap_content" />
 
     </RelativeLayout>
+
+    <com.jaygoo.widget.VerticalRangeSeekBar
+        android:id="@+id/fontSizeSeekBar"
+        android:layout_width="50dp"
+        android:layout_height="200dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        app:rsb_mode="single"
+        app:rsb_tick_mark_mode="number"
+        app:rsb_indicator_show_mode="alwaysHide"
+        />
 
 </RelativeLayout>
