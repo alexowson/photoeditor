@@ -115,7 +115,7 @@ public class PhotoEditorView extends FrameLayout {
         multiTouchListener.setOnMultiTouchListener(onMultiTouchListener);
         addTextRootView.setOnTouchListener(multiTouchListener);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER;
         addView(addTextRootView, params);
         addTextView.setGravity(gravity);
