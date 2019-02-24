@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -49,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int SHARE_STORAGE_PERMS_REQUEST_CODE = 900;
     private final String[] sharePerms = { android.Manifest.permission.WRITE_EXTERNAL_STORAGE,  android.Manifest.permission.READ_EXTERNAL_STORAGE};
 
+    private static final int GRAVITY_CENTER = Gravity.CENTER;
+    private static final int GRAVITY_LEFT = Gravity.LEFT|Gravity.CENTER_VERTICAL;
+    private static final int GRAVITY_RIGHT = Gravity.RIGHT|Gravity.CENTER_VERTICAL;
 
     @BindView(R.id.mainContainer)
     View mainContainer;
@@ -57,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     PhotoEditorView photoEditorView;
 
     private int colorCodeTextView = -1;
+    private int gravityTextView = GRAVITY_CENTER;
     private ArrayList<Integer> colorPickerColors;
 
     @Override
@@ -133,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.addTextButton)
     void onAddTextButtonClick() {
-        openAddTextPopupWindow("", -1);
+        openAddTextPopupWindow("", -1, GRAVITY_CENTER);
     }
 
     @OnClick(R.id.shareImageButton)
@@ -174,12 +179,28 @@ public class MainActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(shareIntent, "Share image using"));
     }
 
-    private void openAddTextPopupWindow(String text, int colorCode) {
+    private void openAddTextPopupWindow(String text, int colorCode, int gravity) {
         colorCodeTextView = colorCode;
+        gravityTextView  = gravity;
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View addTextPopupWindowRootView = inflater.inflate(R.layout.add_text_popup_window, null);
         final EditText addTextEditText = (EditText) addTextPopupWindowRootView.findViewById(R.id.add_text_edit_text);
         TextView addTextDoneTextView = (TextView) addTextPopupWindowRootView.findViewById(R.id.add_text_done_tv);
+        final ImageView addTextAlignImageView = (ImageView) addTextPopupWindowRootView.findViewById(R.id.add_text_align_iv);
+
+        switch (gravityTextView) {
+            case GRAVITY_LEFT:
+                addTextAlignImageView.setImageResource(R.drawable.ic_align_left);
+                break;
+            case GRAVITY_CENTER:
+                addTextAlignImageView.setImageResource(R.drawable.ic_align_center);
+                break;
+            case GRAVITY_RIGHT:
+                addTextAlignImageView.setImageResource(R.drawable.ic_align_right);
+                break;
+        }
+        addTextEditText.setGravity(gravityTextView);
+
         RecyclerView addTextColorPickerRecyclerView = (RecyclerView) addTextPopupWindowRootView.findViewById(R.id.add_text_color_picker_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
         addTextColorPickerRecyclerView.setLayoutManager(layoutManager);
@@ -206,10 +227,30 @@ public class MainActivity extends AppCompatActivity {
         pop.showAtLocation(addTextPopupWindowRootView, Gravity.TOP, 0, 0);
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        addTextAlignImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (gravityTextView) {
+                    case GRAVITY_LEFT:
+                        gravityTextView = GRAVITY_CENTER;
+                        addTextAlignImageView.setImageResource(R.drawable.ic_align_center);
+                        break;
+                    case GRAVITY_CENTER:
+                        gravityTextView = GRAVITY_RIGHT;
+                        addTextAlignImageView.setImageResource(R.drawable.ic_align_right);
+                        break;
+                    case GRAVITY_RIGHT:
+                        gravityTextView = GRAVITY_LEFT;
+                        addTextAlignImageView.setImageResource(R.drawable.ic_align_left);
+                        break;
+                }
+                addTextEditText.setGravity(gravityTextView);
+            }
+        });
         addTextDoneTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addText(addTextEditText.getText().toString(), colorCodeTextView);
+                addText(addTextEditText.getText().toString(), colorCodeTextView, gravityTextView);
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 pop.dismiss();
@@ -226,8 +267,8 @@ public class MainActivity extends AppCompatActivity {
                 .start(RESULT_LOAD_IMG_REQUEST_CODE);
     }
 
-    private void addText(String text, int colorCodeTextView) {
-        photoEditorView.addText(text, colorCodeTextView);
+    private void addText(String text, int colorCodeTextView, int gravity) {
+        photoEditorView.addText(text, colorCodeTextView, gravity);
     }
 
     private boolean stringIsNotEmpty(String string) {
@@ -241,8 +282,8 @@ public class MainActivity extends AppCompatActivity {
 
     private OnPhotoEditorListener onPhotoEditorSDKListener = new OnPhotoEditorListener() {
         @Override
-        public void onEditTextChangeListener(String text, int colorCode) {
-            openAddTextPopupWindow(text, colorCode);
+        public void onEditTextChangeListener(String text, int colorCode, int gravity) {
+            openAddTextPopupWindow(text, colorCode, gravity);
         }
 
         @Override
