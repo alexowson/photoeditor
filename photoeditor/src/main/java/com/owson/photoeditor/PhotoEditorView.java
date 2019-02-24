@@ -103,23 +103,24 @@ public class PhotoEditorView extends FrameLayout {
         deleteView.setVisibility(GONE);
     }
 
-    public void addText(String text, int colorCodeTextView, int gravity, float text_size_dip) {
+    public void addText(String text, int colorCodeTextView, int gravity, float text_size_dip, int bgCodeTextView) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         addTextRootView = inflater.inflate(R.layout.photo_editor_sdk_text_item_list, null);
         TextView addTextView = (TextView) addTextRootView.findViewById(R.id.photo_editor_sdk_text_tv);
         addTextView.setText(text);
-        if (colorCodeTextView != -1)
+//        if (colorCodeTextView != -1)
             addTextView.setTextColor(colorCodeTextView);
         MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView,
                 this, photoImageView, onPhotoEditorListener);
         multiTouchListener.setOnMultiTouchListener(onMultiTouchListener);
         addTextRootView.setOnTouchListener(multiTouchListener);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER;
         addView(addTextRootView, params);
         addTextView.setGravity(gravity);
         addTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, text_size_dip);
+        addTextView.setBackgroundColor(bgCodeTextView);
 //        addedViews.add(addTextRootView);
 //        if (onPhotoEditorListener != null)
 //            onPhotoEditorListener.onAddViewListener(ViewType.TEXT, addedViews.size());

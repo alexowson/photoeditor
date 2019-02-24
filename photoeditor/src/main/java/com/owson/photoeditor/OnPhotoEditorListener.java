@@ -6,7 +6,7 @@ package com.owson.photoeditor;
 
 public interface OnPhotoEditorListener {
 
-    void onEditTextChangeListener(String text, int colorCode, int gravity, float text_size_dip);
+    void onEditTextChangeListener(String text, int colorCode, int gravity, float text_size_dip, int bgCode);
 
 //    void onAddViewListener(ViewType viewType, int numberOfAddedViews);
 

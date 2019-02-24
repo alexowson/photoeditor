@@ -19,16 +19,17 @@
         android:padding="10dp"
         android:src="@drawable/ic_align_center" />
 
-    <!--<SeekBar-->
-        <!--android:id="@+id/seekBar"-->
-        <!--android:layout_width="100dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentStart="true"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:max="10"-->
-        <!--android:progress="5"-->
-        <!--android:rotation="270" />-->
+
+    <ImageView
+        android:id="@+id/add_text_bg_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/add_text_align_iv"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_border_text_view"
+        android:padding="10dp"
+        android:src="@drawable/ic_color_fill" />
 
     <TextView
         android:id="@+id/add_text_done_tv"
@@ -48,10 +49,10 @@
     <EditText
         android:id="@+id/add_text_edit_text"
         style="@style/EditText"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/add_text_color_picker_relative_layout"
-        android:layout_below="@+id/add_text_done_tv"
+        android:layout_marginTop="150dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:background="@null"
         android:gravity="center"
         android:inputType="textMultiLine"

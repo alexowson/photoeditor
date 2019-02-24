@@ -3,6 +3,7 @@ package com.owson.photoeditorapp;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -69,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Integer> colorPickerColors;
 
-    private int colorCodeTextView = -1;
+    private int colorCodeTextView = Color.WHITE;
+    private int bgCodeTextView = Color.TRANSPARENT;
     private int gravityTextView = GRAVITY_CENTER;
     private float textSizeTextView = -1;
 
@@ -147,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.addTextButton)
     void onAddTextButtonClick() {
-        openAddTextPopupWindow("", -1, GRAVITY_CENTER, TEXT_SIZE_DIP_MIN);
+        openAddTextPopupWindow("", Color.WHITE, GRAVITY_CENTER, TEXT_SIZE_DIP_MIN, Color.TRANSPARENT);
     }
 
     @OnClick(R.id.shareImageButton)
@@ -188,8 +190,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(shareIntent, "Share image using"));
     }
 
-    private void openAddTextPopupWindow(String text, int colorCode, int gravity, float text_size_dip) {
+    private void openAddTextPopupWindow(String text, int colorCode, int gravity, float text_size_dip, int bgCode) {
         colorCodeTextView = colorCode;
+        bgCodeTextView = bgCode;
         gravityTextView  = gravity;
         textSizeTextView  = text_size_dip;
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -197,7 +200,8 @@ public class MainActivity extends AppCompatActivity {
         final EditText addTextEditText = (EditText) addTextPopupWindowRootView.findViewById(R.id.add_text_edit_text);
         TextView addTextDoneTextView = (TextView) addTextPopupWindowRootView.findViewById(R.id.add_text_done_tv);
         addTextEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeTextView);
-        final ImageView addTextAlignImageView = (ImageView) addTextPopupWindowRootView.findViewById(R.id.add_text_align_iv);
+        final ImageView addTextAlignImageView = addTextPopupWindowRootView.findViewById(R.id.add_text_align_iv);
+        final ImageView addTextBackgroundImageView = addTextPopupWindowRootView.findViewById(R.id.add_text_bg_iv);
 
         switch (gravityTextView) {
             case GRAVITY_LEFT:
@@ -250,10 +254,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         addTextColorPickerRecyclerView.setAdapter(colorPickerAdapter);
-        if (stringIsNotEmpty(text)) {
+//        if (stringIsNotEmpty(text)) {
             addTextEditText.setText(text);
-            addTextEditText.setTextColor(colorCode == -1 ? getResources().getColor(R.color.white) : colorCode);
-        }
+//            addTextEditText.setTextColor(colorCode == -1 ? getResources().getColor(R.color.white) : colorCode);
+            addTextEditText.setTextColor(colorCode);
+            addTextEditText.setBackgroundColor(bgCode);
+//        }
         final PopupWindow pop = new PopupWindow(MainActivity.this);
         pop.setContentView(addTextPopupWindowRootView);
         pop.setWidth(LinearLayout.LayoutParams.MATCH_PARENT);
@@ -283,10 +289,32 @@ public class MainActivity extends AppCompatActivity {
                 addTextEditText.setGravity(gravityTextView);
             }
         });
+        addTextBackgroundImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(bgCodeTextView == Color.TRANSPARENT) {
+                    if(addTextEditText.getCurrentTextColor() != getResources().getColor(R.color.white)) {
+                        bgCodeTextView = addTextEditText.getCurrentTextColor();
+                        colorCodeTextView = getResources().getColor(R.color.white);
+                    }else {
+                        bgCodeTextView = getResources().getColor(R.color.white);
+                        colorCodeTextView = getResources().getColor(R.color.black);
+                    }
+
+                    addTextEditText.setTextColor(colorCodeTextView);
+                    addTextEditText.setBackgroundColor(bgCodeTextView);
+                } else {
+                    colorCodeTextView = bgCodeTextView;
+                    addTextEditText.setTextColor(colorCodeTextView);
+                    addTextEditText.setBackground(null);
+                    bgCodeTextView = Color.TRANSPARENT;
+                }
+            }
+        });
         addTextDoneTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addText(addTextEditText.getText().toString(), colorCodeTextView, gravityTextView, textSizeTextView);
+                addText(addTextEditText.getText().toString(), colorCodeTextView, gravityTextView, textSizeTextView, bgCodeTextView);
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 pop.dismiss();
@@ -303,8 +331,8 @@ public class MainActivity extends AppCompatActivity {
                 .start(RESULT_LOAD_IMG_REQUEST_CODE);
     }
 
-    private void addText(String text, int colorCodeTextView, int gravity, float text_size) {
-        photoEditorView.addText(text, colorCodeTextView, gravity, text_size);
+    private void addText(String text, int colorCodeTextView, int gravity, float text_size, int bgCodeTextView) {
+        photoEditorView.addText(text, colorCodeTextView, gravity, text_size, bgCodeTextView);
     }
 
     private boolean stringIsNotEmpty(String string) {
@@ -318,8 +346,8 @@ public class MainActivity extends AppCompatActivity {
 
     private OnPhotoEditorListener onPhotoEditorSDKListener = new OnPhotoEditorListener() {
         @Override
-        public void onEditTextChangeListener(String text, int colorCode, int gravity, float text_size_dip) {
-            openAddTextPopupWindow(text, colorCode, gravity, text_size_dip);
+        public void onEditTextChangeListener(String text, int colorCode, int gravity, float text_size_dip, int bgCode) {
+            openAddTextPopupWindow(text, colorCode, gravity, text_size_dip, bgCode);
         }
 
         @Override
