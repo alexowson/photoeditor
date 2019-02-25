@@ -147,18 +147,18 @@ class MultiTouchListener implements OnTouchListener {
                                     ((TextView) view).getText().toString(), ((TextView) view).getCurrentTextColor());
                         }
                         if (onPhotoEditorListener != null) {
-                            float textSizeDip = ((TextView) view).getTextSize() / view.getContext().getResources().getDisplayMetrics().density;
+                            int textSizeDip = (int) (((TextView) view).getTextSize() / view.getContext().getResources().getDisplayMetrics().density);
                             ColorDrawable cd = (ColorDrawable) ((TextView) view).getBackground();
-                            int colorCode = -1;
+                            int bgColorCode = -1;
                             if(cd != null)
-                                colorCode = cd.getColor();
+                                bgColorCode = cd.getColor();
 
                             onPhotoEditorListener.onEditTextChangeListener(
                                     ((TextView) view).getText().toString(),
                                     ((TextView) view).getCurrentTextColor(),
                                     ((TextView) view).getGravity(),
                                     textSizeDip,
-                                    colorCode);
+                                    bgColorCode);
                         }
                     }
                 }

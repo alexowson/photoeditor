@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.content.FileProvider;
+import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     private int colorCodeTextView = Color.WHITE;
     private int bgCodeTextView = Color.TRANSPARENT;
     private int gravityTextView = GRAVITY_CENTER;
-    private float textSizeTextView = -1;
+    private int textSizeTextView = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(shareIntent, "Share image using"));
     }
 
-    private void openAddTextPopupWindow(String text, int colorCode, int gravity, float text_size_dip, int bgCode) {
+    private void openAddTextPopupWindow(String text, int colorCode, int gravity, int text_size_dip, int bgCode) {
         colorCodeTextView = colorCode;
         bgCodeTextView = bgCode;
         gravityTextView  = gravity;
@@ -226,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
 //                Log.i(TAG, "onRangeChanged: " + leftValue + ", " + rightValue);
-                textSizeTextView = leftValue;
+                textSizeTextView = (int)leftValue;
                 addTextEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeTextView);
             }
 
@@ -260,6 +261,7 @@ public class MainActivity extends AppCompatActivity {
             addTextEditText.setTextColor(colorCode);
             addTextEditText.setBackgroundColor(bgCode);
 //        }
+
         final PopupWindow pop = new PopupWindow(MainActivity.this);
         pop.setContentView(addTextPopupWindowRootView);
         pop.setWidth(LinearLayout.LayoutParams.MATCH_PARENT);
@@ -331,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
                 .start(RESULT_LOAD_IMG_REQUEST_CODE);
     }
 
-    private void addText(String text, int colorCodeTextView, int gravity, float text_size, int bgCodeTextView) {
+    private void addText(String text, int colorCodeTextView, int gravity, int text_size, int bgCodeTextView) {
         photoEditorView.addText(text, colorCodeTextView, gravity, text_size, bgCodeTextView);
     }
 
@@ -346,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
 
     private OnPhotoEditorListener onPhotoEditorSDKListener = new OnPhotoEditorListener() {
         @Override
-        public void onEditTextChangeListener(String text, int colorCode, int gravity, float text_size_dip, int bgCode) {
+        public void onEditTextChangeListener(String text, int colorCode, int gravity, int text_size_dip, int bgCode) {
             openAddTextPopupWindow(text, colorCode, gravity, text_size_dip, bgCode);
         }
 
