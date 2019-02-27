@@ -12,6 +12,13 @@ import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextWatcher;
+import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -26,6 +33,7 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.autofit.et.lib.AutoFitEditText;
 import com.esafirm.imagepicker.model.Image;
 import com.jaygoo.widget.OnRangeChangedListener;
 import com.jaygoo.widget.RangeSeekBar;
@@ -198,8 +206,8 @@ public class MainActivity extends AppCompatActivity {
         textSizeTextView  = text_size_dip;
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View addTextPopupWindowRootView = inflater.inflate(R.layout.add_text_popup_window, null);
-        final EditText addTextEditText = (EditText) addTextPopupWindowRootView.findViewById(R.id.add_text_edit_text);
-        TextView addTextDoneTextView = (TextView) addTextPopupWindowRootView.findViewById(R.id.add_text_done_tv);
+        final AutoFitEditText addTextEditText =  addTextPopupWindowRootView.findViewById(R.id.add_text_edit_text);
+        TextView addTextDoneTextView = addTextPopupWindowRootView.findViewById(R.id.add_text_done_tv);
         addTextEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeTextView);
         final ImageView addTextAlignImageView = addTextPopupWindowRootView.findViewById(R.id.add_text_align_iv);
         final ImageView addTextBackgroundImageView = addTextPopupWindowRootView.findViewById(R.id.add_text_bg_iv);
@@ -256,11 +264,13 @@ public class MainActivity extends AppCompatActivity {
         });
         addTextColorPickerRecyclerView.setAdapter(colorPickerAdapter);
 //        if (stringIsNotEmpty(text)) {
-            addTextEditText.setText(text);
+            addTextEditText.setText(getSpannableString(text, bgCode));
 //            addTextEditText.setTextColor(colorCode == -1 ? getResources().getColor(R.color.white) : colorCode);
             addTextEditText.setTextColor(colorCode);
-            addTextEditText.setBackgroundColor(bgCode);
+//            addTextEditText.setBackgroundColor(bgCode);
 //        }
+
+        addTextEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeTextView);
 
         final PopupWindow pop = new PopupWindow(MainActivity.this);
         pop.setContentView(addTextPopupWindowRootView);
@@ -304,11 +314,19 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     addTextEditText.setTextColor(colorCodeTextView);
-                    addTextEditText.setBackgroundColor(bgCodeTextView);
+//                    addTextEditText.setBackgroundColor(bgCodeTextView);
+
+                    String text = addTextEditText.getText().toString();
+                    addTextEditText.setText(getSpannableString(text, bgCodeTextView));
+
                 } else {
                     colorCodeTextView = bgCodeTextView;
                     addTextEditText.setTextColor(colorCodeTextView);
-                    addTextEditText.setBackground(null);
+//                    addTextEditText.setBackground(null);
+
+                    String text = addTextEditText.getText().toString();
+                    addTextEditText.setText(getSpannableString(text, Color.TRANSPARENT));
+
                     bgCodeTextView = Color.TRANSPARENT;
                 }
             }
@@ -322,6 +340,12 @@ public class MainActivity extends AppCompatActivity {
                 pop.dismiss();
             }
         });
+    }
+
+    private SpannableString getSpannableString(String text, int backgroundColor) {
+        SpannableString spannableString = new SpannableString(text);
+        spannableString.setSpan(new BackgroundColorSpan(backgroundColor), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return spannableString;
     }
 
     private void loadPhotoFromGallery(){

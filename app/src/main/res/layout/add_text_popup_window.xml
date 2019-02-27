@@ -46,17 +46,19 @@
         android:textColor="@color/white"
         android:textSize="15sp" />
 
-    <EditText
+    <com.autofit.et.lib.AutoFitEditText
         android:id="@+id/add_text_edit_text"
         style="@style/EditText"
         android:layout_marginTop="150dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:background="@null"
         android:gravity="center"
-        android:inputType="textMultiLine"
-        android:textSize="40sp" />
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:textSize="40sp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
 
 
     <RelativeLayout

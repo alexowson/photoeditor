@@ -41,4 +41,6 @@ dependencies {
 
     //Permissions
     implementation 'pub.devrel:easypermissions:2.0.1'
+
+    implementation 'com.github.ViksaaSkool:AutoFitEditText:53238e2d29'
 }
