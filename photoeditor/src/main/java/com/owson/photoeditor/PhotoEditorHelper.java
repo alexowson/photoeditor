@@ -8,7 +8,7 @@ public final class PhotoEditorHelper {
 
     public static SpannableString getSpannableString(String text, int backgroundColor) {
         SpannableString spannableString = new SpannableString(text);
-        spannableString.setSpan(new BackgroundColorSpan(backgroundColor), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableString.setSpan(new BackgroundColorSpan(backgroundColor), 0, text.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         return spannableString;
     }
 
