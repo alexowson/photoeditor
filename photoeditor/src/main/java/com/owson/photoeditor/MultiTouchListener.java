@@ -1,5 +1,6 @@
 package com.owson.photoeditor;
 
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.view.MotionEvent;
@@ -147,18 +148,13 @@ class MultiTouchListener implements OnTouchListener {
                                     ((TextView) view).getText().toString(), ((TextView) view).getCurrentTextColor());
                         }
                         if (onPhotoEditorListener != null) {
-                            int textSizeDip = (int) (((TextView) view).getTextSize() / view.getContext().getResources().getDisplayMetrics().density);
-                            ColorDrawable cd = (ColorDrawable) ((TextView) view).getBackground();
-                            int bgColorCode = -1;
-                            if(cd != null)
-                                bgColorCode = cd.getColor();
+                            float textSizeDip = ((TextView) view).getTextSize() / view.getContext().getResources().getDisplayMetrics().density;
 
                             onPhotoEditorListener.onEditTextChangeListener(
-                                    ((TextView) view).getText().toString(),
+                                    ((TextView) view).getText(),
                                     ((TextView) view).getCurrentTextColor(),
                                     ((TextView) view).getGravity(),
-                                    textSizeDip,
-                                    bgColorCode);
+                                    textSizeDip);
                         }
                     }
                 }

@@ -6,6 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.widget.TextViewCompat;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.BackgroundColorSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -104,10 +107,12 @@ public class PhotoEditorView extends FrameLayout {
         deleteView.setVisibility(GONE);
     }
 
-    public void addText(String text, int colorCodeTextView, int gravity, int text_size_dip, int bgCodeTextView) {
+    //public void addText(CharSequence text, int colorCodeTextView, int gravity, int text_size_dip, int bgColorSpannable) {
+    public void addText(CharSequence text, int colorCodeTextView, int gravity, int text_size_dip) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         addTextRootView = inflater.inflate(R.layout.photo_editor_sdk_text_item_list, null);
         TextView addTextView = (TextView) addTextRootView.findViewById(R.id.photo_editor_sdk_text_tv);
+        //addTextView.setText(PhotoEditorHelper.getSpannableString(text, bgColorSpannable));
         addTextView.setText(text);
 //        if (colorCodeTextView != -1)
             addTextView.setTextColor(colorCodeTextView);
@@ -121,7 +126,7 @@ public class PhotoEditorView extends FrameLayout {
         addView(addTextRootView, params);
         addTextView.setGravity(gravity);
         addTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, text_size_dip);
-        addTextView.setBackgroundColor(bgCodeTextView);
+        //addTextView.setBackgroundColor(bgCodeTextView);
 //        addedViews.add(addTextRootView);
 //        if (onPhotoEditorListener != null)
 //            onPhotoEditorListener.onAddViewListener(ViewType.TEXT, addedViews.size());
@@ -253,4 +258,10 @@ public class PhotoEditorView extends FrameLayout {
             }
         }
     };
+
+    public static SpannableString getSpannableString(String text, int backgroundColor) {
+        SpannableString spannableString = new SpannableString(text);
+        spannableString.setSpan(new BackgroundColorSpan(backgroundColor), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return spannableString;
+    }
 }

@@ -39,6 +39,7 @@ import com.jaygoo.widget.OnRangeChangedListener;
 import com.jaygoo.widget.RangeSeekBar;
 import com.jaygoo.widget.VerticalRangeSeekBar;
 import com.owson.photoeditor.OnPhotoEditorListener;
+import com.owson.photoeditor.PhotoEditorHelper;
 import com.owson.photoeditor.PhotoEditorView;
 
 import com.esafirm.imagepicker.features.ImagePicker;
@@ -80,9 +81,9 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Integer> colorPickerColors;
 
     private int colorCodeTextView = Color.WHITE;
-    private int bgCodeTextView = Color.TRANSPARENT;
+    //private int bgColorSpannableTextView = Color.TRANSPARENT;
     private int gravityTextView = GRAVITY_CENTER;
-    private int textSizeTextView = -1;
+    private float textSizeTextView = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,7 +159,8 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.addTextButton)
     void onAddTextButtonClick() {
-        openAddTextPopupWindow("", Color.WHITE, GRAVITY_CENTER, TEXT_SIZE_DIP_MIN, Color.TRANSPARENT);
+        //openAddTextPopupWindow("", Color.WHITE, GRAVITY_CENTER, TEXT_SIZE_DIP_MIN, Color.TRANSPARENT);
+        openAddTextPopupWindow("", Color.WHITE, GRAVITY_CENTER, TEXT_SIZE_DIP_MIN);
     }
 
     @OnClick(R.id.shareImageButton)
@@ -199,9 +201,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(shareIntent, "Share image using"));
     }
 
-    private void openAddTextPopupWindow(String text, int colorCode, int gravity, int text_size_dip, int bgCode) {
+    private void openAddTextPopupWindow(CharSequence text, int colorCode, int gravity, float text_size_dip) {
         colorCodeTextView = colorCode;
-        bgCodeTextView = bgCode;
+        //bgColorSpannableTextView = bgColorSpannable;
         gravityTextView  = gravity;
         textSizeTextView  = text_size_dip;
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -230,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
 
         VerticalRangeSeekBar fontSizeSeekBar = addTextPopupWindowRootView.findViewById(R.id.fontSizeSeekBar);
         fontSizeSeekBar.setRange(TEXT_SIZE_DIP_MIN, TEXT_SIZE_DIP_MAX);
-        fontSizeSeekBar.setValue(text_size_dip);
+        fontSizeSeekBar.setValue(Math.max(text_size_dip, TEXT_SIZE_DIP_MIN));
         fontSizeSeekBar.setOnRangeChangedListener(new OnRangeChangedListener() {
             @Override
             public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
@@ -264,7 +266,8 @@ public class MainActivity extends AppCompatActivity {
         });
         addTextColorPickerRecyclerView.setAdapter(colorPickerAdapter);
 //        if (stringIsNotEmpty(text)) {
-            addTextEditText.setText(getSpannableString(text, bgCode));
+            //addTextEditText.setText(PhotoEditorHelper.getSpannableString(text, bgColorSpannableTextView));
+            addTextEditText.setText(text);
 //            addTextEditText.setTextColor(colorCode == -1 ? getResources().getColor(R.color.white) : colorCode);
             addTextEditText.setTextColor(colorCode);
 //            addTextEditText.setBackgroundColor(bgCode);
@@ -277,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
         pop.setWidth(LinearLayout.LayoutParams.MATCH_PARENT);
         pop.setHeight(LinearLayout.LayoutParams.MATCH_PARENT);
         pop.setFocusable(true);
-        pop.setBackgroundDrawable(null);
+        //pop.setBackgroundDrawable(null);
         pop.showAtLocation(addTextPopupWindowRootView, Gravity.TOP, 0, 0);
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
@@ -304,12 +307,20 @@ public class MainActivity extends AppCompatActivity {
         addTextBackgroundImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(bgCodeTextView == Color.TRANSPARENT) {
+                int bgColorSpannable = Color.TRANSPARENT;
+                if( addTextEditText.getText() instanceof SpannableString) {
+                    SpannableString spannableString = (SpannableString)addTextEditText.getText();
+                    BackgroundColorSpan[] spans =  spannableString.getSpans(0, spannableString.length(), BackgroundColorSpan.class);
+                    if(spans != null && spans.length > 0)
+                        bgColorSpannable = spans[0].getBackgroundColor();
+                }
+
+                if(bgColorSpannable == Color.TRANSPARENT) {
                     if(addTextEditText.getCurrentTextColor() != getResources().getColor(R.color.white)) {
-                        bgCodeTextView = addTextEditText.getCurrentTextColor();
+                        bgColorSpannable = addTextEditText.getCurrentTextColor();
                         colorCodeTextView = getResources().getColor(R.color.white);
                     }else {
-                        bgCodeTextView = getResources().getColor(R.color.white);
+                        bgColorSpannable = getResources().getColor(R.color.white);
                         colorCodeTextView = getResources().getColor(R.color.black);
                     }
 
@@ -317,24 +328,26 @@ public class MainActivity extends AppCompatActivity {
 //                    addTextEditText.setBackgroundColor(bgCodeTextView);
 
                     String text = addTextEditText.getText().toString();
-                    addTextEditText.setText(getSpannableString(text, bgCodeTextView));
+                    addTextEditText.setText(PhotoEditorHelper.getSpannableString(text, bgColorSpannable));
 
                 } else {
-                    colorCodeTextView = bgCodeTextView;
+                    colorCodeTextView = bgColorSpannable;
                     addTextEditText.setTextColor(colorCodeTextView);
 //                    addTextEditText.setBackground(null);
 
                     String text = addTextEditText.getText().toString();
-                    addTextEditText.setText(getSpannableString(text, Color.TRANSPARENT));
+                    addTextEditText.setText(PhotoEditorHelper.getSpannableString(text, Color.TRANSPARENT));
 
-                    bgCodeTextView = Color.TRANSPARENT;
+                    //bgColorSpannable = Color.TRANSPARENT;
                 }
             }
         });
         addTextDoneTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addText(addTextEditText.getText().toString(), colorCodeTextView, gravityTextView, textSizeTextView, bgCodeTextView);
+                float fontSizeDip = addTextEditText.getTextSize() / getResources().getDisplayMetrics().density;
+
+                addText(addTextEditText.getText(), colorCodeTextView, gravityTextView, (int)fontSizeDip);
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 pop.dismiss();
@@ -342,11 +355,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private SpannableString getSpannableString(String text, int backgroundColor) {
-        SpannableString spannableString = new SpannableString(text);
-        spannableString.setSpan(new BackgroundColorSpan(backgroundColor), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return spannableString;
-    }
+
 
     private void loadPhotoFromGallery(){
         ImagePicker.create(this)
@@ -357,8 +366,9 @@ public class MainActivity extends AppCompatActivity {
                 .start(RESULT_LOAD_IMG_REQUEST_CODE);
     }
 
-    private void addText(String text, int colorCodeTextView, int gravity, int text_size, int bgCodeTextView) {
-        photoEditorView.addText(text, colorCodeTextView, gravity, text_size, bgCodeTextView);
+    //private void addText(CharSequence text, int colorCodeTextView, int gravity, int text_size_dip, int bgCodeTextView) {
+    private void addText(CharSequence text, int colorCodeTextView, int gravity, int text_size_dip) {
+        photoEditorView.addText(text, colorCodeTextView, gravity, text_size_dip);
     }
 
     private boolean stringIsNotEmpty(String string) {
@@ -372,8 +382,8 @@ public class MainActivity extends AppCompatActivity {
 
     private OnPhotoEditorListener onPhotoEditorSDKListener = new OnPhotoEditorListener() {
         @Override
-        public void onEditTextChangeListener(String text, int colorCode, int gravity, int text_size_dip, int bgCode) {
-            openAddTextPopupWindow(text, colorCode, gravity, text_size_dip, bgCode);
+        public void onEditTextChangeListener(CharSequence text, int colorCode, int gravity, float text_size_dip) {
+            openAddTextPopupWindow(text, colorCode, gravity, text_size_dip);
         }
 
         @Override
