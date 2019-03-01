@@ -26,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -78,12 +79,17 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.photoEditorView)
     PhotoEditorView photoEditorView;
 
+    @BindView(R.id.rationButton)
+    Button rationButton;
+
     private ArrayList<Integer> colorPickerColors;
 
     private int colorCodeTextView = Color.WHITE;
     //private int bgColorSpannableTextView = Color.TRANSPARENT;
     private int gravityTextView = GRAVITY_CENTER;
     private float textSizeTextView = -1;
+
+    private boolean squareRatio = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,30 +98,28 @@ public class MainActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        final RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) photoEditorView.getLayoutParams();
-
         ViewTreeObserver viewTreeObserver = mainContainer.getViewTreeObserver();
         if (viewTreeObserver.isAlive()) {
             viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
                     mainContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-
-                    lp.height = mainContainer.getWidth();
-                    photoEditorView.setLayoutParams(lp);
+                    changeSquareRatio();
                 }
             });
         }
 
         photoEditorView.setImageResource(R.drawable.cat);
+        photoEditorView.setRotateEnabled(true);
+        photoEditorView.setMode(PhotoEditorView.Mode.FREE);
         photoEditorView.setOnPhotoEditorListener(onPhotoEditorSDKListener);
-        photoEditorView.getAdjustButton().setText("");
+        /*photoEditorView.getAdjustButton().setText("");
         photoEditorView.getAdjustButton().getLayoutParams().width = getResources().getDimensionPixelSize(R.dimen.adjust_button_size);
         photoEditorView.getAdjustButton().getLayoutParams().height = getResources().getDimensionPixelSize(R.dimen.adjust_button_size);
         photoEditorView.getAdjustButton().setBackgroundResource(R.drawable.adjust_button_bg);
         photoEditorView.getAdjustButton().setCompoundDrawablesWithIntrinsicBounds(
                 getResources().getDrawable(R.drawable.ic_adjust),
-                null, null, null);
+                null, null, null);*/
 
         colorPickerColors = new ArrayList<>();
         colorPickerColors.add(getResources().getColor(R.color.black));
@@ -150,6 +154,41 @@ public class MainActivity extends AppCompatActivity {
                 photoEditorView.setImageFilePath(images.get(0).getPath());
             }
         }
+    }
+
+    @OnClick(R.id.rationButton)
+    void onRationButtonClick() {
+        changeRatio();
+    }
+
+    private void changeRatio() {
+        if(!squareRatio) {
+            rationButton.setText("1:1");
+            changeSquareRatio();
+        } else {
+            rationButton.setText("4:5");
+            change_4_5_ratio();
+        }
+    }
+
+    private void changeSquareRatio() {
+        if(squareRatio)
+            return;
+
+        squareRatio = true;
+        final RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) photoEditorView.getLayoutParams();
+        lp.height = mainContainer.getWidth();
+        photoEditorView.setLayoutParams(lp);
+    }
+
+    private void change_4_5_ratio() {
+        if(!squareRatio)
+            return;
+
+        squareRatio = false;
+        final RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) photoEditorView.getLayoutParams();
+        lp.height = mainContainer.getWidth() * 5 / 4;
+        photoEditorView.setLayoutParams(lp);
     }
 
     @OnClick(R.id.loadImageButton)

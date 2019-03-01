@@ -17,6 +17,14 @@
         android:layout_height="200dp"
         android:background="@android:color/white">
 
+        <Button
+            android:id="@+id/rationButton"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_margin="4dp"
+            android:padding="0dp"
+            android:text="1:1"
+            android:layout_gravity="left|bottom"/>
     </com.owson.photoeditor.PhotoEditorView>
 
     <LinearLayout
