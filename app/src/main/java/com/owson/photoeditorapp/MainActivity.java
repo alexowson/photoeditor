@@ -109,10 +109,10 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        photoEditorView.setOnPhotoEditorListener(onPhotoEditorSDKListener);
         photoEditorView.setImageResource(R.drawable.cat);
         photoEditorView.setRotateEnabled(true);
         photoEditorView.setMode(PhotoEditorView.Mode.FREE);
-        photoEditorView.setOnPhotoEditorListener(onPhotoEditorSDKListener);
         /*photoEditorView.getAdjustButton().setText("");
         photoEditorView.getAdjustButton().getLayoutParams().width = getResources().getDimensionPixelSize(R.dimen.adjust_button_size);
         photoEditorView.getAdjustButton().getLayoutParams().height = getResources().getDimensionPixelSize(R.dimen.adjust_button_size);
@@ -427,10 +427,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onChangeModeListener(PhotoEditorView.Mode mode) {
-            if(mode == PhotoEditorView.Mode.SQUARE)
-                photoEditorView.setDisabledAdjustCropAreaImage(false);
-            else if(mode == PhotoEditorView.Mode.FREE)
-                photoEditorView.setDisabledAdjustCropAreaImage(true);
+            
         }
 
         @Override
