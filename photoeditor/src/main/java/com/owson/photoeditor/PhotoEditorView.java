@@ -27,7 +27,6 @@ public class PhotoEditorView extends FrameLayout {
 
     private Context context;
 
-    private Button adjustButton;
     private ImageCropView photoImageView;
     private Mode mode = Mode.SQUARE;
 
@@ -64,34 +63,10 @@ public class PhotoEditorView extends FrameLayout {
         photoImageView.setGridInnerMode(ImageCropView.GRID_OFF);
         photoImageView.setGridOuterMode(ImageCropView.GRID_OFF);
         photoImageView.setTransparentLayerColor(Color.parseColor("#00000000"));
-        photoImageView.setDoubleTapListener(doubleTapListener);
+//        photoImageView.setDoubleTapListener(doubleTapListener);
 //        photoImageView.setDoubleTapEnabled(true);
         addView(photoImageView);
         squareMode();
-
-        //Adding button
-        adjustButton = new Button(context);
-        adjustButton.setText(getResources().getString(R.string.adjust));
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-                ViewGroup.MarginLayoutParams.WRAP_CONTENT,
-                ViewGroup.MarginLayoutParams.WRAP_CONTENT);
-        lp.gravity = Gravity.LEFT | Gravity.BOTTOM;
-        lp.setMargins(getResources().getDimensionPixelSize(R.dimen.adjust_button_margin),
-                getResources().getDimensionPixelSize(R.dimen.adjust_button_margin),
-                getResources().getDimensionPixelSize(R.dimen.adjust_button_margin),
-                getResources().getDimensionPixelSize(R.dimen.adjust_button_margin));
-        adjustButton.setLayoutParams(lp);
-        adjustButton.setOnClickListener(onClickListener);
-        addView(adjustButton);
-
-        /*deleteView = new RelativeLayout(context);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-        addView(deleteView, params);
-
-        Te*/
-
         addDeleteView();
     }
 
@@ -175,10 +150,6 @@ public class PhotoEditorView extends FrameLayout {
         photoImageView.setRotateEnabled(rotateEnabled);
     }
 
-    public Button getAdjustButton() {
-        return adjustButton;
-    }
-
     public void setOnPhotoEditorListener(OnPhotoEditorListener onPhotoEditorListener) {
         this.onPhotoEditorListener = onPhotoEditorListener;
     }
@@ -212,15 +183,6 @@ public class PhotoEditorView extends FrameLayout {
         return mode;
     }
 
-    private void handleImageAdjust() {
-//        if(photoImageState != PhotoImageState.CENTER_CROP) {
-        if(mode != Mode.SQUARE) {
-            squareMode();
-        }else {
-            freeMode();
-        }
-    }
-
     private void viewUndo(View removedView) {
        /* if (addedViews.size() > 0) {
             if (addedViews.contains(removedView)) {*/
@@ -244,22 +206,6 @@ public class PhotoEditorView extends FrameLayout {
         @Override
         public void onRemoveViewListener(View removedView) {
             viewUndo(removedView);
-        }
-    };
-
-    private ImageCropView.OnImageViewTouchDoubleTapListener doubleTapListener = new ImageCropView.OnImageViewTouchDoubleTapListener() {
-        @Override
-        public void onDoubleTap() {
-            handleImageAdjust();
-        }
-    };
-
-    private OnClickListener onClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if(v == adjustButton) {
-                handleImageAdjust();
-            }
         }
     };
 
