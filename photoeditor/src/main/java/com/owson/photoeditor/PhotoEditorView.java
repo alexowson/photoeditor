@@ -171,6 +171,10 @@ public class PhotoEditorView extends FrameLayout {
         photoImageView.setDisabledAdjustCropAreaImage(disabledAdjustCropAreaImage);
     }
 
+    public void setRotateEnabled(boolean rotateEnabled) {
+        photoImageView.setRotateEnabled(rotateEnabled);
+    }
+
     public Button getAdjustButton() {
         return adjustButton;
     }
