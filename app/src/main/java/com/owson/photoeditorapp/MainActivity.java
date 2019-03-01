@@ -308,9 +308,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int bgColorSpannable = Color.TRANSPARENT;
-                if( addTextEditText.getText() instanceof SpannableString) {
-                    SpannableString spannableString = (SpannableString)addTextEditText.getText();
-                    BackgroundColorSpan[] spans =  spannableString.getSpans(0, spannableString.length(), BackgroundColorSpan.class);
+                if( addTextEditText.getText() instanceof SpannableStringBuilder) {
+                    SpannableStringBuilder spannableStringBuilder = (SpannableStringBuilder)addTextEditText.getText();
+                    BackgroundColorSpan[] spans =  spannableStringBuilder.getSpans(0, spannableStringBuilder.length(), BackgroundColorSpan.class);
                     if(spans != null && spans.length > 0)
                         bgColorSpannable = spans[0].getBackgroundColor();
                 }
