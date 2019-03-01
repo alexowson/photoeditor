@@ -156,6 +156,7 @@ public class PhotoEditorView extends FrameLayout {
 
     private void squareMode() {
         photoImageView.setAspectRatio(1, 1);
+        photoImageView.setDisabledAdjustCropAreaImage(true);
         mode = Mode.SQUARE;
         if(onPhotoEditorListener != null)
             onPhotoEditorListener.onChangeModeListener(mode);
@@ -163,6 +164,7 @@ public class PhotoEditorView extends FrameLayout {
 
     private void freeMode() {
         photoImageView.setAspectRatio(720, 405);
+        photoImageView.setDisabledAdjustCropAreaImage(true);
         mode = Mode.FREE;
         if(onPhotoEditorListener != null)
             onPhotoEditorListener.onChangeModeListener(mode);
