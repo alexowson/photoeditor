@@ -154,7 +154,8 @@ class MultiTouchListener implements OnTouchListener {
                                     ((TextView) view).getText(),
                                     ((TextView) view).getCurrentTextColor(),
                                     ((TextView) view).getGravity(),
-                                    textSizeDip);
+                                    textSizeDip,
+                                    view);
                         }
                     }
                 }

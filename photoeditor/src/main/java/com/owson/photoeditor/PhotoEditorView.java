@@ -83,28 +83,30 @@ public class PhotoEditorView extends FrameLayout {
     }
 
     //public void addText(CharSequence text, int colorCodeTextView, int gravity, int text_size_dip, int bgColorSpannable) {
-    public void addText(CharSequence text, int colorCodeTextView, int gravity, int text_size_dip) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        addTextRootView = inflater.inflate(R.layout.photo_editor_sdk_text_item_list, null);
-        TextView addTextView = (TextView) addTextRootView.findViewById(R.id.photo_editor_sdk_text_tv);
-        //addTextView.setText(PhotoEditorHelper.getSpannableString(text, bgColorSpannable));
+    public void addText(CharSequence text, int colorCodeTextView, int gravity, int text_size_dip, View refView) {
+        TextView addTextView;
+        if(refView != null && refView instanceof TextView && refView.getParent() == this) {
+            addTextView = (TextView) refView;
+        }else {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            addTextRootView = inflater.inflate(R.layout.photo_editor_sdk_text_item_list, null);
+            addTextView = (TextView) addTextRootView.findViewById(R.id.photo_editor_sdk_text_tv);
+
+            MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView,
+                    this, photoImageView, onPhotoEditorListener);
+//        multiTouchListener.setOnMultiTouchListener(onMultiTouchListener);
+            addTextRootView.setOnTouchListener(multiTouchListener);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.gravity = Gravity.CENTER;
+            addView(addTextRootView, params);
+        }
+
         addTextView.setText(text);
 //        if (colorCodeTextView != -1)
-            addTextView.setTextColor(colorCodeTextView);
-        MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView,
-                this, photoImageView, onPhotoEditorListener);
-        multiTouchListener.setOnMultiTouchListener(onMultiTouchListener);
-        addTextRootView.setOnTouchListener(multiTouchListener);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.gravity = Gravity.CENTER;
-        addView(addTextRootView, params);
+        addTextView.setTextColor(colorCodeTextView);
         addTextView.setGravity(gravity);
         addTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, text_size_dip);
-        //addTextView.setBackgroundColor(bgCodeTextView);
-//        addedViews.add(addTextRootView);
-//        if (onPhotoEditorListener != null)
-//            onPhotoEditorListener.onAddViewListener(ViewType.TEXT, addedViews.size());
     }
 
     public Bitmap getViewAdBitmapImage() {
@@ -183,37 +185,5 @@ public class PhotoEditorView extends FrameLayout {
 
     public Mode getMode() {
         return mode;
-    }
-
-    private void viewUndo(View removedView) {
-       /* if (addedViews.size() > 0) {
-            if (addedViews.contains(removedView)) {*/
-                removeView(removedView);
-               /* addedViews.remove(removedView);
-                if (onPhotoEditorListener != null)
-                    onPhotoEditorListener.onRemoveViewListener(addedViews.size());
-            }
-        }*/
-    }
-
-    private MultiTouchListener.OnMultiTouchListener onMultiTouchListener = new MultiTouchListener.OnMultiTouchListener() {
-        @Override
-        public void onEditTextClickListener(String text, int colorCode) {
-            if (addTextRootView != null) {
-                removeView(addTextRootView);
-//                addedViews.remove(addTextRootView);
-            }
-        }
-
-        @Override
-        public void onRemoveViewListener(View removedView) {
-            viewUndo(removedView);
-        }
-    };
-
-    public static SpannableString getSpannableString(String text, int backgroundColor) {
-        SpannableString spannableString = new SpannableString(text);
-        spannableString.setSpan(new BackgroundColorSpan(backgroundColor), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return spannableString;
     }
 }
