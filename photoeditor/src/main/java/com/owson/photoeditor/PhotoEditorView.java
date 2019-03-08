@@ -63,6 +63,7 @@ public class PhotoEditorView extends FrameLayout {
         photoImageView.setGridInnerMode(ImageCropView.GRID_OFF);
         photoImageView.setGridOuterMode(ImageCropView.GRID_OFF);
         photoImageView.setTransparentLayerColor(Color.parseColor("#00000000"));
+        photoImageView.setAutoCentered(false);
 //        photoImageView.setDoubleTapListener(doubleTapListener);
 //        photoImageView.setDoubleTapEnabled(true);
         addView(photoImageView);
