@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean squareRatio = false;
 
+    private TextView currentTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -198,6 +200,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.addTextButton)
     void onAddTextButtonClick() {
+        currentTextView = null;
         //openAddTextPopupWindow("", Color.WHITE, GRAVITY_CENTER, TEXT_SIZE_DIP_MIN, Color.TRANSPARENT);
         openAddTextPopupWindow("", Color.WHITE, GRAVITY_CENTER, TEXT_SIZE_DIP_MIN);
     }
@@ -407,7 +410,8 @@ public class MainActivity extends AppCompatActivity {
 
     //private void addText(CharSequence text, int colorCodeTextView, int gravity, int text_size_dip, int bgCodeTextView) {
     private void addText(CharSequence text, int colorCodeTextView, int gravity, int text_size_dip) {
-        photoEditorView.addText(text, colorCodeTextView, gravity, text_size_dip);
+        photoEditorView.addText(text, colorCodeTextView, gravity, text_size_dip, currentTextView);
+        currentTextView = null;
     }
 
     private boolean stringIsNotEmpty(String string) {
@@ -421,7 +425,11 @@ public class MainActivity extends AppCompatActivity {
 
     private OnPhotoEditorListener onPhotoEditorSDKListener = new OnPhotoEditorListener() {
         @Override
-        public void onEditTextChangeListener(CharSequence text, int colorCode, int gravity, float text_size_dip) {
+        public void onEditTextChangeListener(CharSequence text, int colorCode, int gravity, float text_size_dip, View refView) {
+            if(refView instanceof TextView)
+                currentTextView = (TextView) refView;
+            else
+                currentTextView = null;
             openAddTextPopupWindow(text, colorCode, gravity, text_size_dip);
         }
 
