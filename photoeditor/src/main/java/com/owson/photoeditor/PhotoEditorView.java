@@ -63,7 +63,6 @@ public class PhotoEditorView extends FrameLayout {
         photoImageView.setGridInnerMode(ImageCropView.GRID_OFF);
         photoImageView.setGridOuterMode(ImageCropView.GRID_OFF);
         photoImageView.setTransparentLayerColor(Color.parseColor("#00000000"));
-        photoImageView.setAutoCentered(false);
 //        photoImageView.setDoubleTapListener(doubleTapListener);
 //        photoImageView.setDoubleTapEnabled(true);
         addView(photoImageView);
@@ -149,6 +148,10 @@ public class PhotoEditorView extends FrameLayout {
         photoImageView.setDisabledAdjustCropAreaImage(disabledAdjustCropAreaImage);
     }
 
+    public void setImageAutoCentered(boolean autoCentered) {
+        photoImageView.setAutoCentered(autoCentered);
+    }
+
     public void setRotateEnabled(boolean rotateEnabled) {
         photoImageView.setRotateEnabled(rotateEnabled);
     }
@@ -159,7 +162,8 @@ public class PhotoEditorView extends FrameLayout {
 
     private void squareMode() {
         photoImageView.setAspectRatio(1, 1);
-        photoImageView.setDisabledAdjustCropAreaImage(true);
+        photoImageView.setDisabledAdjustCropAreaImage(false);
+        photoImageView.setAutoCentered(true);
         mode = Mode.SQUARE;
         if(onPhotoEditorListener != null)
             onPhotoEditorListener.onChangeModeListener(mode);
@@ -168,6 +172,7 @@ public class PhotoEditorView extends FrameLayout {
     private void freeMode() {
         photoImageView.setAspectRatio(720, 405);
         photoImageView.setDisabledAdjustCropAreaImage(true);
+        photoImageView.setAutoCentered(false);
         mode = Mode.FREE;
         if(onPhotoEditorListener != null)
             onPhotoEditorListener.onChangeModeListener(mode);
