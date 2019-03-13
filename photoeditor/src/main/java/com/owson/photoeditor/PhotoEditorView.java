@@ -94,7 +94,7 @@ public class PhotoEditorView extends FrameLayout {
 
             MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView,
                     this, photoImageView, onPhotoEditorListener);
-//        multiTouchListener.setOnMultiTouchListener(onMultiTouchListener);
+            multiTouchListener.setOnMultiTouchListener(onMultiTouchListener);
             addTextRootView.setOnTouchListener(multiTouchListener);
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -192,4 +192,30 @@ public class PhotoEditorView extends FrameLayout {
     public Mode getMode() {
         return mode;
     }
+
+    private void viewUndo(View removedView) {
+       /* if (addedViews.size() > 0) {
+            if (addedViews.contains(removedView)) {*/
+        removeView(removedView);
+               /* addedViews.remove(removedView);
+                if (onPhotoEditorListener != null)
+                    onPhotoEditorListener.onRemoveViewListener(addedViews.size());
+            }
+        }*/
+    }
+
+    private MultiTouchListener.OnMultiTouchListener onMultiTouchListener = new MultiTouchListener.OnMultiTouchListener() {
+        @Override
+        public void onEditTextClickListener(String text, int colorCode) {
+            if (addTextRootView != null) {
+//                removeView(addTextRootView);
+//                addedViews.remove(addTextRootView);
+            }
+        }
+
+        @Override
+        public void onRemoveViewListener(View removedView) {
+            viewUndo(removedView);
+        }
+    };
 }
