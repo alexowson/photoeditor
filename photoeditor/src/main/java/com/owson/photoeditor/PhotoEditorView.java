@@ -193,6 +193,10 @@ public class PhotoEditorView extends FrameLayout {
         return mode;
     }
 
+    public void setMinScaleImage(float minScaleImage) {
+        photoImageView.setMinScale(minScaleImage);
+    }
+
     private void viewUndo(View removedView) {
        /* if (addedViews.size() > 0) {
             if (addedViews.contains(removedView)) {*/
