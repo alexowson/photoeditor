@@ -7,12 +7,14 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -24,6 +26,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -35,6 +38,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.autofit.et.lib.AutoFitEditText;
+import com.autofit.et.lib.AutoFitEditTextUtil;
 import com.esafirm.imagepicker.model.Image;
 import com.jaygoo.widget.OnRangeChangedListener;
 import com.jaygoo.widget.RangeSeekBar;
@@ -50,6 +54,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -70,8 +75,13 @@ public class MainActivity extends AppCompatActivity {
     private static final int GRAVITY_LEFT = Gravity.LEFT|Gravity.CENTER_VERTICAL;
     private static final int GRAVITY_RIGHT = Gravity.RIGHT|Gravity.CENTER_VERTICAL;
 
-    private static final int TEXT_SIZE_DIP_MIN = 44;
-    private static final int TEXT_SIZE_DIP_MAX = 64;
+//    private static final int SLIDER_MIN_VALUE = 20;
+//    private static final int SLIDER_MAX_VALUE = 60;
+//    private static final int SLIDER_DEFAULT_VALUE = 40;
+
+    private static final int SLIDER_MIN_VALUE = 10;
+    private static final int SLIDER_MAX_VALUE = 35;
+    private static final int SLIDER_DEFAULT_VALUE = 15;
 
     @BindView(R.id.mainContainer)
     View mainContainer;
@@ -87,11 +97,12 @@ public class MainActivity extends AppCompatActivity {
     private int colorCodeTextView = Color.WHITE;
     //private int bgColorSpannableTextView = Color.TRANSPARENT;
     private int gravityTextView = GRAVITY_CENTER;
-    private float textSizeTextView = -1;
+//    private float widthTextView = -1;
 
     private boolean squareRatio = false;
 
     private TextView currentTextView;
+    private int charsPerLine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,14 +125,8 @@ public class MainActivity extends AppCompatActivity {
         photoEditorView.setOnPhotoEditorListener(onPhotoEditorSDKListener);
         photoEditorView.setImageResource(R.drawable.cat);
         photoEditorView.setRotateEnabled(true);
-        photoEditorView.setMode(PhotoEditorView.Mode.SQUARE);
-        /*photoEditorView.getAdjustButton().setText("");
-        photoEditorView.getAdjustButton().getLayoutParams().width = getResources().getDimensionPixelSize(R.dimen.adjust_button_size);
-        photoEditorView.getAdjustButton().getLayoutParams().height = getResources().getDimensionPixelSize(R.dimen.adjust_button_size);
-        photoEditorView.getAdjustButton().setBackgroundResource(R.drawable.adjust_button_bg);
-        photoEditorView.getAdjustButton().setCompoundDrawablesWithIntrinsicBounds(
-                getResources().getDrawable(R.drawable.ic_adjust),
-                null, null, null);*/
+        photoEditorView.setMode(PhotoEditorView.Mode.FREE);
+        photoEditorView.setMinScaleImage(0.3f);
 
         colorPickerColors = new ArrayList<>();
         colorPickerColors.add(getResources().getColor(R.color.black));
@@ -202,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
     void onAddTextButtonClick() {
         currentTextView = null;
         //openAddTextPopupWindow("", Color.WHITE, GRAVITY_CENTER, TEXT_SIZE_DIP_MIN, Color.TRANSPARENT);
-        openAddTextPopupWindow("", Color.WHITE, GRAVITY_CENTER, TEXT_SIZE_DIP_MIN);
+        openAddTextPopupWindow("1234567890", Color.WHITE, GRAVITY_CENTER, SLIDER_DEFAULT_VALUE);
     }
 
     @OnClick(R.id.shareImageButton)
@@ -243,16 +248,38 @@ public class MainActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(shareIntent, "Share image using"));
     }
 
-    private void openAddTextPopupWindow(CharSequence text, int colorCode, int gravity, float text_size_dip) {
+    private void openAddTextPopupWindow(CharSequence text, int colorCode, int gravity, final float slider_value) {
         colorCodeTextView = colorCode;
         //bgColorSpannableTextView = bgColorSpannable;
         gravityTextView  = gravity;
-        textSizeTextView  = text_size_dip;
+//        widthTextView  = text_width_dip;
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View addTextPopupWindowRootView = inflater.inflate(R.layout.add_text_popup_window, null);
+
         final AutoFitEditText addTextEditText =  addTextPopupWindowRootView.findViewById(R.id.add_text_edit_text);
+        addTextEditText.setEnableSizeCache(false);
+        addTextEditText.setMovementMethod(null);
+        addTextEditText.setMinTextSize(pixelToDp(5.0f));
+        AutoFitEditTextUtil.setNormalization(this, addTextPopupWindowRootView, addTextEditText);
+//        addTextEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, slider_value);
+        addTextEditText.setGravity(gravityTextView);
+        addTextEditText.setText(text);
+        addTextEditText.setTextColor(colorCode);
+        addTextEditText.setBackgroundColor(Color.GRAY);
+        addTextEditText.addTextChangedListener(new TextChangeListener(addTextEditText));
+        addTextEditText.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                addTextEditText.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                applyAutoWrap(addTextEditText, (int)slider_value);
+            }
+        });
+        //        int w = (int)(text_width_dip * TypedValue.COMPLEX_UNIT_DIP);
+//        addTextEditText.getLayoutParams().width = w;
+
         TextView addTextDoneTextView = addTextPopupWindowRootView.findViewById(R.id.add_text_done_tv);
-        addTextEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeTextView);
+
         final ImageView addTextAlignImageView = addTextPopupWindowRootView.findViewById(R.id.add_text_align_iv);
         final ImageView addTextBackgroundImageView = addTextPopupWindowRootView.findViewById(R.id.add_text_bg_iv);
 
@@ -267,20 +294,28 @@ public class MainActivity extends AppCompatActivity {
                 addTextAlignImageView.setImageResource(R.drawable.ic_align_right);
                 break;
         }
-        addTextEditText.setGravity(gravityTextView);
 
 //        float text_size_min = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, TEXT_SIZE_DIP_MIN, getResources().getDisplayMetrics());
 //        float text_size_max = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, TEXT_SIZE_DIP_MAX, getResources().getDisplayMetrics());
 
         VerticalRangeSeekBar fontSizeSeekBar = addTextPopupWindowRootView.findViewById(R.id.fontSizeSeekBar);
-        fontSizeSeekBar.setRange(TEXT_SIZE_DIP_MIN, TEXT_SIZE_DIP_MAX);
-        fontSizeSeekBar.setValue(Math.max(text_size_dip, TEXT_SIZE_DIP_MIN));
+        fontSizeSeekBar.setRange(SLIDER_MIN_VALUE, SLIDER_MAX_VALUE);
+        fontSizeSeekBar.setValue(Math.max(slider_value, SLIDER_MIN_VALUE));
         fontSizeSeekBar.setOnRangeChangedListener(new OnRangeChangedListener() {
             @Override
             public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
 //                Log.i(TAG, "onRangeChanged: " + leftValue + ", " + rightValue);
-                textSizeTextView = (int)leftValue;
-                addTextEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeTextView);
+                /*widthTextView = (int)leftValue;
+                Log.i(TAG, "onRangeChanged: widthTextView="+widthTextView);
+                ViewGroup.LayoutParams lp = addTextEditText.getLayoutParams();
+
+                lp.width = (int)(TEXT_WIDTH_DIP_MAX  - (leftValue - TEXT_WIDTH_DIP_MIN));
+                addTextEditText.setLayoutParams(lp);*/
+//                addTextEditText.invalidate();
+//                addTextEditText.setEnableSizeCache(false);
+                //addTextEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeTextView);
+                //addTextEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, leftValue);
+                applyAutoWrap(addTextEditText, (int)leftValue);
             }
 
             @Override
@@ -307,15 +342,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         addTextColorPickerRecyclerView.setAdapter(colorPickerAdapter);
-//        if (stringIsNotEmpty(text)) {
-            //addTextEditText.setText(PhotoEditorHelper.getSpannableString(text, bgColorSpannableTextView));
-            addTextEditText.setText(text);
-//            addTextEditText.setTextColor(colorCode == -1 ? getResources().getColor(R.color.white) : colorCode);
-            addTextEditText.setTextColor(colorCode);
-//            addTextEditText.setBackgroundColor(bgCode);
-//        }
-
-        addTextEditText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeTextView);
 
         final PopupWindow pop = new PopupWindow(MainActivity.this);
         pop.setContentView(addTextPopupWindowRootView);
@@ -473,4 +499,164 @@ public class MainActivity extends AppCompatActivity {
         }
         return bmpUri;
     }
+
+    private void applyAutoWrap(AutoFitEditText et, int value){
+//        InputFilter[] filters = et.getFilters();
+//        InputFilter[] newFilters = Arrays.copyOf(filters, filters.length + 1);
+//        newFilters[filters.length] = new AutoWrapFilter(wrapLength);
+//        et.setFilters(newFilters);
+
+//        et.setTextSize(TypedValue.COMPLEX_UNIT_DIP, wrapLength);
+
+        /*int w = (int)(wrapLength * et.getTextSize() * getResources().getDisplayMetrics().density);
+
+//        et.setPadding(w, 0 , w, 0);
+        ViewGroup.LayoutParams lp = et.getLayoutParams();
+        lp.width = w;
+        et.setLayoutParams(lp);*/
+
+        charsPerLine = SLIDER_MAX_VALUE  - (value - SLIDER_MIN_VALUE);
+
+        Log.e(TAG, "applyAutoWrap: ========");
+        Log.e(TAG, "applyAutoWrap: charsPerLine=" +  charsPerLine);
+
+        float parentWidth= pixelToDp( ((View)et.getParent()).getWidth() );
+        Log.e(TAG, "applyAutoWrap: parentWidth=" +  parentWidth);
+
+        if(et.getLayoutParams().width <= 0) {
+           ViewGroup.LayoutParams lp = et.getLayoutParams();
+            lp.width = ((View)et.getParent()).getWidth();
+            et.setLayoutParams(lp);
+        }
+
+        adjustWidthEditText(et, et.getText().length(), et.getText().length());
+
+        float textSize = parentWidth * 0.25f / charsPerLine ;
+        et.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize);
+        Log.e(TAG, "applyAutoWrap: textSize=" +  textSize);
+
+//        float width = parentWidth * 1.70f / wrapLength
+//
+//        ViewGroup.LayoutParams lp = et.getLayoutParams();
+//        lp.width = w;
+//        et.setLayoutParams(lp);
+    }
+
+    private void adjustWidthEditText(AutoFitEditText et, int previousLength, int currentLength) {
+        float textSize = et.getTextSize();
+        int currentWidth = et.getLayoutParams().width;
+
+        int changeToWidth = (int)(textSize * charsPerLine * 0.62);
+
+        Log.e(TAG, "applyAutoWrap: previousLength="+previousLength);
+        Log.e(TAG, "applyAutoWrap: currentLength="+currentLength);
+        Log.e(TAG, "applyAutoWrap: charsPerLine="+charsPerLine);
+        Log.e(TAG, "applyAutoWrap: currentWidth="+currentWidth);
+        Log.e(TAG, "applyAutoWrap: changeToWidth="+changeToWidth);
+        if(charsPerLine >= 30) {
+            int parentWidth= ((View)et.getParent()).getWidth();
+            ViewGroup.LayoutParams lp = et.getLayoutParams();
+            lp.width = parentWidth;
+            et.setLayoutParams(lp);
+            Log.e(TAG, "applyAutoWrap: ========Applied Full Width");
+        }
+        else if( (previousLength < currentLength && currentWidth > changeToWidth) ||
+                (previousLength > currentLength && currentWidth < changeToWidth) ) {
+//            Log.e(TAG, "applyAutoWrap: ========");
+//            Log.e(TAG, "applyAutoWrap: ========Start adjustWidthEditText");
+//            Log.e(TAG, "applyAutoWrap: textSize=" + textSize);
+
+            ViewGroup.LayoutParams lp = et.getLayoutParams();
+            lp.width = changeToWidth;
+            et.setLayoutParams(lp);
+
+//            Log.e(TAG, "applyAutoWrap: " + charsPerLine + " lines currentWidth=" + currentWidth +
+//                    " / changeToWidth=" + changeToWidth);
+//            Log.e(TAG, "applyAutoWrap: ========Start adjustWidthEditText");
+//            Log.e(TAG, "applyAutoWrap: ========");
+            Log.e(TAG, "applyAutoWrap: ========Applied");
+        }
+    }
+
+    private float pixelToDp(float size) {
+//        return size / getResources().getDisplayMetrics().density;
+        return TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                size,
+                getResources().getDisplayMetrics());
+    }
+
+    private class TextChangeListener implements TextWatcher {
+
+        private AutoFitEditText et;
+        private int lastTextLength;
+
+        public TextChangeListener(@NonNull AutoFitEditText et) {
+            this.et = et;
+            lastTextLength = et.getText().length();
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+//            Log.e(TAG, "afterTextChanged: afterTextChanged s=" + s);
+
+            adjustWidthEditText(et, lastTextLength, lastTextLength = et.getText().length());
+        }
+    }
+
+//    private class AutoWrapFilter implements InputFilter {
+//        private final int mLineChars;
+//
+//        public AutoWrapFilter(int pLineChars) {
+//            mLineChars = pLineChars;
+//        }
+//
+//        @Override
+//        public CharSequence filter(CharSequence src, int srcStart, int srcEnd, Spanned dest, int destStart, int destEnd) {
+//            CharSequence original = dest.subSequence(0,destStart);
+//            CharSequence replacement = src.subSequence(srcStart,srcEnd);
+//
+//            if(replacement.length() < 1){
+//                return null;
+//            }
+//
+//            int lastLineCharIndex = -1;
+//
+//            for (int j = destStart - 1; j >= 0; j--){
+//                if(original.charAt(j) == '\n'){
+//                    lastLineCharIndex = j;
+//                    break;
+//                }
+//            }
+//
+//            int charsAfterLine = lastLineCharIndex < 0 ? original.length() : original.length() - lastLineCharIndex;
+//
+//            StringBuilder sb = new StringBuilder();
+//
+//            for (int k = 0; k < replacement.length(); k++){
+//
+//                if(charsAfterLine == mLineChars+1){
+//                    charsAfterLine = 0;
+//                    sb.append('\n');
+//                }
+//
+//                sb.append(replacement.charAt(k));
+//                charsAfterLine++;
+//
+//            }
+//
+//
+//            return sb;
+//        }
+//    }
 }
